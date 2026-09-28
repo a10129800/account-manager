@@ -1376,3 +1376,34 @@ input[type="range"]::-webkit-slider-thumb {
   from { opacity: 1; transform: translateX(0); }
   to { opacity: 0; transform: translateX(20px); }
 }
+
+/* ===== 行動端與窄視窗自適應 (Mobile & Responsive Rules) ===== */
+@media (max-width: 680px) {
+  .app-container {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 240px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .main-content {
+    height: calc(100vh - var(--titlebar-height) - 240px);
+    padding: 16px 12px;
+  }
+  .auth-container {
+    padding: 24px 18px;
+  }
+  .modal-content {
+    width: 94vw;
+    max-width: 94vw;
+    margin: 10px;
+    padding: 20px 16px;
+  }
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

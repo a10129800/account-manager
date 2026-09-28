@@ -854,37 +854,33 @@
       color: var(--neon-cyan);
     }
 
-    /* 頁尾 */
-    .footer {
-      text-align: center;
-      margin-top: 50px;
-      font-size: 13px;
-      color: var(--text-muted);
-      border-top: 1px solid var(--border);
-      padding-top: 24px;
-      font-family: var(--font-mono);
+    /* 表格水平滑動容器 (避免手機版面被表格撐開) */
+    .file-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 10px;
+      scrollbar-width: thin;
     }
 
-    @media print {
-      .top-actions, .nav-tabs-wrapper, .floating-toc {
-        display: none !important;
-      }
-      .tab-panel {
-        display: block !important;
-        margin-bottom: 40px;
-      }
-      body {
-        background: white !important;
-        color: black !important;
-      }
-      .section-card {
-        box-shadow: none !important;
-        border: 1px solid #ccc !important;
-      }
-      .welcome-overlay {
-        display: none !important;
-      }
+    .hero-flex-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
     }
+
+    .hero-content-col {
+      flex: 1;
+      min-width: 320px;
+    }
+
+    .hero-mascot-col {
+      text-align: center;
+      flex-shrink: 0;
+    }
+
 
     /* 歡迎畫面遮罩與卡片 (Welcome Splash Screen) */
     .welcome-overlay {
@@ -1135,35 +1131,88 @@
       font-weight: 700;
     }
 
-    /* ===== 右側懸浮目錄導航 (Floating TOC) ===== */
+    /* ===== 目錄背景遮罩 (TOC Backdrop - 點擊快速收合) ===== */
+    .toc-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 4, 10, 0.7);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 9998;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+      pointer-events: none;
+    }
+    .toc-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    /* ===== 目錄導航面板 (TOC Drawer - 預設收合，永不遮擋內容) ===== */
     .floating-toc {
       position: fixed;
-      right: 24px;
-      top: 130px;
-      width: 205px;
-      background: rgba(10, 17, 34, 0.9);
-      border: 1px solid var(--border);
+      right: 20px;
+      top: 68px;
+      width: 250px;
+      max-width: calc(100vw - 32px);
+      max-height: calc(100vh - 90px);
+      background: rgba(7, 13, 27, 0.98);
+      border: 1.5px solid var(--neon-cyan);
       border-radius: var(--radius);
-      padding: 14px 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      z-index: 400;
-      transition: transform 0.25s ease, opacity 0.25s ease;
+      padding: 16px 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 242, 254, 0.35);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 9999;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-origin: top right;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px) scale(0.96);
+      pointer-events: none;
+      overflow-y: auto;
+    }
+
+    .floating-toc.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
     }
 
     .toc-title {
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 800;
       color: var(--neon-cyan);
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 10px;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding-left: 6px;
+      justify-content: space-between;
+      padding-left: 4px;
       font-family: var(--font-mono);
+      border-bottom: 1px dashed rgba(0, 242, 254, 0.25);
+      padding-bottom: 8px;
+    }
+
+    .toc-close-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .toc-close-btn:hover {
+      color: var(--neon-cyan);
+      background: rgba(0, 242, 254, 0.15);
     }
 
     .toc-list {
@@ -1222,12 +1271,6 @@
     .toc-back-top:hover {
       color: #ffffff;
       text-shadow: 0 0 10px var(--neon-cyan);
-    }
-
-    @media (max-width: 1400px) {
-      .floating-toc {
-        display: none;
-      }
     }
 
     /* ===== 吉祥物品牌展廳 (Mascot Gallery) ===== */
@@ -1654,6 +1697,344 @@
       color: #cbd5e1;
       line-height: 1.65;
     }
+
+    /* ===== 手機與平板自適應樣式 (Mobile & Responsive Rules - 置於樣式表末端確保權重) ===== */
+    @media (max-width: 860px) {
+      /* 頂部操作列 */
+      .top-actions {
+        top: 10px;
+        right: 12px;
+        gap: 6px;
+      }
+      .action-btn {
+        padding: 5px 9px;
+        font-size: 11px;
+      }
+
+      /* Hero 區塊自適應 */
+      .hero-banner {
+        padding: 58px 14px 28px;
+      }
+      .hero-flex-wrap {
+        flex-direction: column-reverse;
+        align-items: center;
+        text-align: center;
+        gap: 18px;
+      }
+      .hero-content-col {
+        min-width: 100%;
+      }
+      .hero-title {
+        font-size: 22px;
+        line-height: 1.3;
+      }
+      .hero-desc {
+        font-size: 13px;
+        line-height: 1.55;
+        margin-bottom: 16px;
+      }
+      .meta-tags {
+        justify-content: center;
+        gap: 6px;
+      }
+      .meta-tag {
+        font-size: 11px;
+        padding: 4px 8px;
+      }
+      .doc-classification-bar {
+        justify-content: center;
+      }
+      .cyber-hud-telemetry {
+        font-size: 10px;
+        gap: 6px;
+        padding-bottom: 8px;
+        overflow-x: auto;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* 執行摘要卡片自適應 */
+      .executive-summary-card {
+        grid-template-columns: 1fr;
+        padding: 14px;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      /* 吸頂導航分頁橫向平滑滑動 */
+      .nav-tabs-container {
+        padding: 6px 10px;
+        gap: 6px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        flex-wrap: nowrap;
+      }
+      .nav-tabs-container::-webkit-scrollbar {
+        display: none;
+      }
+      .tab-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+      .tab-badge {
+        font-size: 10px;
+        padding: 1px 5px;
+      }
+      .search-box-wrapper {
+        min-width: 130px;
+        max-width: 170px;
+        flex-shrink: 0;
+      }
+      .search-input {
+        padding: 6px 24px 6px 24px;
+        font-size: 12px;
+      }
+      #btn-nav-toc {
+        padding: 6px 10px;
+        font-size: 12px;
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+
+      /* 主體與卡片容器自適應 */
+      .main-container {
+        margin: 16px auto 0;
+        padding: 0 10px;
+      }
+      .section-card {
+        padding: 18px 14px;
+        margin-bottom: 16px;
+        border-radius: 12px;
+      }
+      .section-header {
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .section-title {
+        font-size: 16.5px;
+      }
+      .section-subtitle {
+        font-size: 12px;
+      }
+
+      /* 數據指標卡片自適應 */
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .stat-card {
+        padding: 16px 14px;
+      }
+      .stat-value {
+        font-size: 24px;
+      }
+
+      /* 任務卡片自適應 */
+      .task-item {
+        padding: 14px 12px;
+        margin-bottom: 12px;
+      }
+      .task-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .task-title {
+        font-size: 14px;
+      }
+      .task-desc {
+        font-size: 12.5px;
+      }
+      .solution-box {
+        padding: 10px 12px;
+        font-size: 12.5px;
+      }
+
+      /* 拓撲節點自適應 */
+      .topology-container {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .topology-node {
+        padding: 16px 14px;
+      }
+      .topology-title {
+        font-size: 14.5px;
+      }
+      .topology-body {
+        font-size: 12.5px;
+      }
+
+      /* RCA 與 ADR 自適應 */
+      .rca-box {
+        padding: 16px 14px;
+      }
+      .rca-title {
+        font-size: 14.5px;
+      }
+      .why-step {
+        font-size: 12.5px;
+        gap: 6px;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .why-num {
+        min-width: unset;
+      }
+      .adr-item {
+        padding: 14px 12px;
+      }
+      .adr-title {
+        font-size: 14.5px;
+      }
+
+      /* 試算器自適應 */
+      .sim-container {
+        padding: 16px 12px;
+      }
+      .sim-input-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .sim-input-row .action-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      .sim-presets {
+        gap: 6px;
+      }
+      .sim-preset-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+      .sim-meta-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .sim-compare-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .sim-compare-card {
+        padding: 14px 12px;
+      }
+      .sim-time-val {
+        font-size: 20px;
+      }
+      .sim-explainer-box {
+        padding: 16px 12px;
+      }
+      .sim-explainer-title {
+        font-size: 14px;
+      }
+      .sim-explainer-body {
+        font-size: 13px;
+      }
+      .sim-explainer-analogy {
+        font-size: 12.5px;
+      }
+
+      /* 吉祥物展廳自適應 */
+      .gallery-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .gallery-thumb-wrap {
+        height: 200px;
+      }
+
+      /* 手機上目錄呈現為精緻居中彈窗 Modal，平時完全不佔用或遮擋螢幕 */
+      .floating-toc {
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: translate(-50%, -46%) scale(0.95);
+        transform-origin: center center;
+        width: 88vw;
+        max-width: 340px;
+        max-height: 80vh;
+      }
+      .floating-toc.open {
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      /* 歡迎封面在手機上的自適應 */
+      .welcome-card {
+        padding: 26px 16px 20px;
+        border-radius: 18px;
+        max-width: 92vw;
+      }
+      .welcome-mascot-glow {
+        width: 115px;
+        height: 115px;
+        margin-bottom: 14px;
+      }
+      .welcome-title {
+        font-size: 20px;
+      }
+      .welcome-subtitle {
+        font-size: 12px;
+        margin-bottom: 16px;
+      }
+      .welcome-features {
+        gap: 5px;
+        margin-bottom: 16px;
+      }
+      .welcome-feature-item {
+        font-size: 10.5px;
+        padding: 3px 7px;
+      }
+      .welcome-btn-enter {
+        padding: 11px 18px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-title {
+        font-size: 19px;
+      }
+      .telemetry-tag:nth-child(n+3) {
+        display: none;
+      }
+      .top-actions .action-btn span:not(:first-child) {
+        display: none;
+      }
+      .top-actions .action-btn {
+        padding: 5px 8px;
+      }
+    }
+
+    @media print {
+      .top-actions, .nav-tabs-wrapper, .floating-toc, .toc-backdrop {
+        display: none !important;
+      }
+      .tab-panel {
+        display: block !important;
+        margin-bottom: 40px;
+      }
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      .section-card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+      }
+      .welcome-overlay {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1733,8 +2114,8 @@
         </span>
       </div>
 
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 320px;">
+      <div class="hero-flex-wrap">
+        <div class="hero-content-col">
           <h1 class="hero-title">帳號管理器 (Account Manager)<br>賽博終端安全架構與工程覆盤報告</h1>
           <p class="hero-desc">
             本報告詳盡彙整本日敏捷衝刺之功能交付清單，並依循頂尖科技大廠標準撰寫工程事後覆盤（Tech Post-Mortem）、架構決策紀錄（ADRs）、根本原因分析（RCA - 5 Whys）與密碼學暴力破解抗性測試。
@@ -1749,7 +2130,7 @@
         </div>
 
         <!-- 右側品牌代表物頭像徽章 (賽博光環) -->
-        <div style="text-align: center; flex-shrink: 0;">
+        <div class="hero-mascot-col">
           <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 10px; border-radius: 50%; overflow: hidden; border: 3px solid var(--neon-cyan); box-shadow: 0 0 30px rgba(0, 242, 254, 0.5), inset 0 0 20px rgba(0, 242, 254, 0.3); background: radial-gradient(circle, #1e293b 0%, #050814 100%);">
             <div style="position: absolute; inset: -8px; background: radial-gradient(circle, rgba(0, 242, 254, 0.5) 0%, rgba(99, 102, 241, 0.3) 60%, transparent 80%); border-radius: 50%;"></div>
             <img src="curry_dog.png" onerror="if(this.src.indexOf('.png')!==-1){this.src='curry_dog.jpg';}" alt="專案代表物" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center 20%; transform: scale(1.32); transform-origin: center 22%; position: relative; z-index: 2;">
@@ -1805,13 +2186,22 @@
         <span class="search-count-badge" id="search-count-badge" style="display: none;">0</span>
         <button class="search-clear-btn" id="search-clear-btn" onclick="clearReportSearch()" style="display: none;" title="清除搜尋">✕</button>
       </div>
+      
+      <!-- 導覽列目錄快速展開按鈕 -->
+      <button class="action-btn" id="btn-nav-toc" onclick="toggleTOC()" style="border-color: var(--neon-cyan); color: var(--neon-cyan); flex-shrink: 0;" title="開啟/收合導覽目錄">
+        <span>📑</span> <span>目錄導覽</span>
+      </button>
     </div>
   </nav>
 
-  <!-- 右側懸浮目錄導航 (Floating TOC) -->
+  <!-- 目錄背景遮罩 (Modal Backdrop - 點擊快速收合) -->
+  <div class="toc-backdrop" id="toc-backdrop" onclick="toggleTOC(false)"></div>
+
+  <!-- 右側懸浮目錄導航面板 (Floating TOC Drawer) -->
   <aside class="floating-toc cyber-brackets" id="floating-toc">
     <div class="toc-title">
-      <span>📑</span> 終端導覽 // TOC
+      <span>📑 終端導覽 // TOC</span>
+      <button class="toc-close-btn" onclick="toggleTOC(false)" title="收合目錄">&times;</button>
     </div>
     <ul class="toc-list" id="toc-list">
       <li><a class="toc-link" onclick="jumpToSection('sec-stats', 'tab-delivery')">📊 數據指標總結</a></li>
@@ -1824,7 +2214,7 @@
       <li><a class="toc-link" onclick="jumpToSection('sec-simulator', 'tab-engineering')">🧮 破解耗時試算與白話解讀</a></li>
       <li><a class="toc-link" onclick="jumpToSection('sec-gallery', 'tab-gallery')">🎨 品牌代表物展廳</a></li>
     </ul>
-    <button class="toc-back-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    <button class="toc-back-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); toggleTOC(false);">
       <span>⬆</span> 回到頂部
     </button>
   </aside>
@@ -1966,52 +2356,54 @@
             </div>
           </div>
         </div>
-        <table class="file-table">
-          <thead>
-            <tr>
-              <th>檔案路徑 (File Path)</th>
-              <th>模組類型</th>
-              <th>主要貢獻說明</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="file-name">src/app.js</td>
-              <td>前端邏輯</td>
-              <td>導入 IIFE 消除語法衝突、實現雙主題切換與本地持久化</td>
-            </tr>
-            <tr>
-              <td class="file-name">src/styles.css</td>
-              <td>視覺系統</td>
-              <td>構建現代 Light 與 Soft Slate Dark 雙套主題 CSS Variables</td>
-            </tr>
-            <tr>
-              <td class="file-name">src/index.html</td>
-              <td>UI 視圖</td>
-              <td>移除外部阻塞字型依賴、標題列新增主題切換按鈕</td>
-            </tr>
-            <tr>
-              <td class="file-name">main.js</td>
-              <td>Electron 主進程</td>
-              <td>同步視窗背景底色、支援 F12/F5 快捷鍵、原生透明 PNG 圖標處理</td>
-            </tr>
-            <tr>
-              <td class="file-name">推送到GitHub.bat / push.ps1</td>
-              <td>發布工具</td>
-              <td>現代 PowerShell 架構，實現一鍵自動推送至 GitHub</td>
-            </tr>
-            <tr>
-              <td class="file-name">匯出吉祥物到桌面.bat / export_mascot.ps1</td>
-              <td>資產工具</td>
-              <td>純 ASCII 封裝，自動輸出吉祥物全套圖檔至桌面與 D 槽專案庫</td>
-            </tr>
-            <tr>
-              <td class="file-name">README.md / 吉祥物使用手冊.md</td>
-              <td>專案文檔</td>
-              <td>標準繁體中文開源文檔，包含功能清單、打包命令與安全 FAQ</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="file-table-wrap">
+          <table class="file-table">
+            <thead>
+              <tr>
+                <th>檔案路徑 (File Path)</th>
+                <th>模組類型</th>
+                <th>主要貢獻說明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="file-name">src/app.js</td>
+                <td>前端邏輯</td>
+                <td>導入 IIFE 消除語法衝突、實現雙主題切換與本地持久化</td>
+              </tr>
+              <tr>
+                <td class="file-name">src/styles.css</td>
+                <td>視覺系統</td>
+                <td>構建現代 Light 與 Soft Slate Dark 雙套主題 CSS Variables</td>
+              </tr>
+              <tr>
+                <td class="file-name">src/index.html</td>
+                <td>UI 視圖</td>
+                <td>移除外部阻塞字型依賴、標題列新增主題切換按鈕</td>
+              </tr>
+              <tr>
+                <td class="file-name">main.js</td>
+                <td>Electron 主進程</td>
+                <td>同步視窗背景底色、支援 F12/F5 快捷鍵、原生透明 PNG 圖標處理</td>
+              </tr>
+              <tr>
+                <td class="file-name">推送到GitHub.bat / push.ps1</td>
+                <td>發布工具</td>
+                <td>現代 PowerShell 架構，實現一鍵自動推送至 GitHub</td>
+              </tr>
+              <tr>
+                <td class="file-name">匯出吉祥物到桌面.bat / export_mascot.ps1</td>
+                <td>資產工具</td>
+                <td>純 ASCII 封裝，自動輸出吉祥物全套圖檔至桌面與 D 槽專案庫</td>
+              </tr>
+              <tr>
+                <td class="file-name">README.md / 吉祥物使用手冊.md</td>
+                <td>專案文檔</td>
+                <td>標準繁體中文開源文檔，包含功能清單、打包命令與安全 FAQ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
     </div>
@@ -2209,42 +2601,44 @@
             </div>
           </div>
         </div>
-        <table class="file-table">
-          <thead>
-            <tr>
-              <th>威脅向量 (Threat Vector)</th>
-              <th>風險評級</th>
-              <th>防禦策略 (Mitigation Strategy)</th>
-              <th>防禦現況</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>硬碟實體失竊 / 拷貝資料庫</strong></td>
-              <td><span class="pill-badge red">Critical</span></td>
-              <td>AES-256-GCM 加密存放，無主密碼在現存算力下無法逆向解密</td>
-              <td><span class="pill-badge green">已完全防禦</span></td>
-            </tr>
-            <tr>
-              <td><strong>記憶體傾印 (Memory Dump)</strong></td>
-              <td><span class="pill-badge" style="background:rgba(255,183,3,0.15);color:var(--warning);border:1px solid var(--warning-border);">High</span></td>
-              <td>應用程式鎖定或關閉時，主進程金鑰變數即刻重置為 null 並主動釋放</td>
-              <td><span class="pill-badge green">已完全防禦</span></td>
-            </tr>
-            <tr>
-              <td><strong>惡意程式碼注入 (XSS)</strong></td>
-              <td><span class="pill-badge red">Critical</span></td>
-              <td>禁用 nodeIntegration，啟用 contextIsolation，且所有渲染文字進行 HTML 實體轉義</td>
-              <td><span class="pill-badge green">已完全防禦</span></td>
-            </tr>
-            <tr>
-              <td><strong>網路中間人攻擊 (MITM)</strong></td>
-              <td><span class="pill-badge green">Low</span></td>
-              <td>100% 本地運作，完全無對外網路連線，徹底免疫網路攔截</td>
-              <td><span class="pill-badge green">先天免疫</span></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="file-table-wrap">
+          <table class="file-table">
+            <thead>
+              <tr>
+                <th>威脅向量 (Threat Vector)</th>
+                <th>風險評級</th>
+                <th>防禦策略 (Mitigation Strategy)</th>
+                <th>防禦現況</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>硬碟實體失竊 / 拷貝資料庫</strong></td>
+                <td><span class="pill-badge red">Critical</span></td>
+                <td>AES-256-GCM 加密存放，無主密碼在現存算力下無法逆向解密</td>
+                <td><span class="pill-badge green">已完全防禦</span></td>
+              </tr>
+              <tr>
+                <td><strong>記憶體傾印 (Memory Dump)</strong></td>
+                <td><span class="pill-badge" style="background:rgba(255,183,3,0.15);color:var(--warning);border:1px solid var(--warning-border);">High</span></td>
+                <td>應用程式鎖定或關閉時，主進程金鑰變數即刻重置為 null 並主動釋放</td>
+                <td><span class="pill-badge green">已完全防禦</span></td>
+              </tr>
+              <tr>
+                <td><strong>惡意程式碼注入 (XSS)</strong></td>
+                <td><span class="pill-badge red">Critical</span></td>
+                <td>禁用 nodeIntegration，啟用 contextIsolation，且所有渲染文字進行 HTML 實體轉義</td>
+                <td><span class="pill-badge green">已完全防禦</span></td>
+              </tr>
+              <tr>
+                <td><strong>網路中間人攻擊 (MITM)</strong></td>
+                <td><span class="pill-badge green">Low</span></td>
+                <td>100% 本地運作，完全無對外網路連線，徹底免疫網路攔截</td>
+                <td><span class="pill-badge green">先天免疫</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <!-- 密碼安全強度與暴力破解耗時 · 互動沙盒試算器 -->
@@ -2496,11 +2890,47 @@
       }
     }
 
-    // TOC 快速跳轉至指定章節與分頁
+    // 目錄展開/收合開關邏輯
+    function toggleTOC(forceState) {
+      var toc = document.getElementById('floating-toc');
+      var backdrop = document.getElementById('toc-backdrop');
+      var navBtn = document.getElementById('btn-nav-toc');
+      if (!toc) return;
+      var isOpen = forceState !== undefined ? forceState : !toc.classList.contains('open');
+      if (isOpen) {
+        toc.classList.add('open');
+        if (backdrop) backdrop.classList.add('open');
+        if (navBtn) {
+          navBtn.style.boxShadow = '0 0 20px rgba(0, 242, 254, 0.7)';
+          navBtn.style.background = 'rgba(0, 242, 254, 0.2)';
+        }
+      } else {
+        toc.classList.remove('open');
+        if (backdrop) backdrop.classList.remove('open');
+        if (navBtn) {
+          navBtn.style.boxShadow = 'none';
+          navBtn.style.background = 'transparent';
+        }
+      }
+    }
+
+    // 點擊目錄外部或遮罩時自動收合
+    document.addEventListener('click', function(e) {
+      var toc = document.getElementById('floating-toc');
+      var navBtn = document.getElementById('btn-nav-toc');
+      if (toc && toc.classList.contains('open')) {
+        if (!toc.contains(e.target) && (!navBtn || !navBtn.contains(e.target))) {
+          toggleTOC(false);
+        }
+      }
+    });
+
+    // TOC 快速跳轉至指定章節與分頁 (跳轉後自動收合，絕不遮擋目標內容)
     function jumpToSection(sectionId, tabId) {
       if (tabId) {
         switchTab(tabId);
       }
+      toggleTOC(false); // 立即收合目錄
       var sec = document.getElementById(sectionId);
       if (sec) {
         sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2605,6 +3035,7 @@
     // 支援快捷鍵 (Escape 關閉、Enter 進入、/ 或 Ctrl+K 搜尋)
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
+        toggleTOC(false);
         closeLightbox();
         closeWelcomeScreen();
       } else if (e.key === 'Enter' || e.key === ' ') {
