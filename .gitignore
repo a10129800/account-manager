@@ -1,0 +1,25 @@
+# 依賴套件（絕對不可上傳，檔案過多且龐大）
+node_modules/
+
+# 打包與構建輸出（EXE 執行檔應透過 GitHub Releases 發布，避免超過 GitHub 100MB 限制）
+dist/
+build/
+
+# 日誌與臨時檔案
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# 編輯器與系統設定
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 備份與本地資料（防範若有人手動複製備份至專案目錄）
+*.enc
+*.key
+帳號備份_*.json
+backup*.json

@@ -1,0 +1,31 @@
+{
+  "name": "account-manager",
+  "version": "1.0.0",
+  "description": "帳號管理器 - 安全的本地帳號密碼管理工具",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder --win",
+    "pack": "electron-builder --dir"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.account-manager.app",
+    "productName": "帳號管理器",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    }
+  }
+}
