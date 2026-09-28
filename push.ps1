@@ -61,16 +61,32 @@ git commit -m $msg
 Write-Host "`n[4/4] 正在推送至 GitHub (main 分支)..." -ForegroundColor Yellow
 git push -u origin main
 
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "`n[自動修復] 檢測到 GitHub 遠端倉庫已有初始檔案，正在自動同步整合..." -ForegroundColor Cyan
+    git pull origin main --rebase
+    
+    Write-Host "`n正在重新推送至 GitHub..." -ForegroundColor Yellow
+    git push -u origin main
+}
+
 if ($LASTEXITCODE -eq 0) {
     Write-Host "`n========================================================" -ForegroundColor Green
     Write-Host "  [成功] 專案已成功推送到 GitHub！" -ForegroundColor Green
+    Write-Host "  網址：https://github.com/a10129800/account-manager" -ForegroundColor Green
     Write-Host "========================================================`n" -ForegroundColor Green
 } else {
     Write-Host "`n========================================================" -ForegroundColor Yellow
-    Write-Host "  [提示] 推送遇到阻礙？常見排除方法：" -ForegroundColor Yellow
-    Write-Host "  1. 若遠端剛建倉庫時有勾選 README，請執行: git pull origin main --rebase" -ForegroundColor Yellow
-    Write-Host "  2. 第一次推送時若彈出 GitHub 登入視窗，請點選授權登入。" -ForegroundColor Yellow
-    Write-Host "========================================================`n" -ForegroundColor Yellow
+    Write-Host "  [提示] 遠端與本地有檔案衝突，是否要以本地專案為準強制覆蓋？" -ForegroundColor Yellow
+    $ans = Read-Host "  👉 是否強制推送覆蓋遠端？(輸入 Y 覆蓋，輸入 N 放棄)"
+    if ($ans -and $ans.Trim().ToUpper() -eq "Y") {
+        Write-Host "`n正在強制推送 (force push)..." -ForegroundColor Yellow
+        git push -u origin main -f
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "`n========================================================" -ForegroundColor Green
+            Write-Host "  [成功] 專案已成功強制推送到 GitHub！" -ForegroundColor Green
+            Write-Host "========================================================`n" -ForegroundColor Green
+        }
+    }
 }
 
 Read-Host "請按 Enter 鍵關閉視窗"
