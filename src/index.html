@@ -10,7 +10,7 @@
   <!-- ===== 自訂標題列 ===== -->
   <div class="titlebar" id="titlebar">
     <div class="titlebar-drag">
-      <span class="titlebar-icon">🔐</span>
+      <img src="curry_dog.png" onerror="if(this.src.indexOf('.png')!==-1){this.src='curry_dog.jpg';}else{this.style.display='none';}" alt="Icon" class="titlebar-mascot-img">
       <span class="titlebar-text">帳號管理器</span>
     </div>
     <div class="titlebar-controls">
@@ -33,9 +33,9 @@
   <div class="auth-screen" id="auth-screen">
     <div class="auth-container">
       <div class="auth-logo">
-        <div class="auth-logo-icon">
-          <div class="shield-glow"></div>
-          🔐
+        <div class="auth-mascot-wrap">
+          <div class="mascot-glow"></div>
+          <img src="curry_dog.png" onerror="if(this.src.indexOf('.png')!==-1){this.src='curry_dog.jpg';}" alt="Icon" class="auth-mascot-img">
         </div>
         <h1 class="auth-title">帳號管理器</h1>
         <p class="auth-subtitle">安全存儲，隨手掌握</p>
@@ -94,7 +94,9 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="user-info">
-          <div class="user-avatar">🔐</div>
+          <div class="user-avatar-wrap">
+            <img src="curry_dog.png" onerror="if(this.src.indexOf('.png')!==-1){this.src='curry_dog.jpg';}" alt="Icon" class="user-avatar-mascot">
+          </div>
           <div>
             <div class="user-name">帳號管理器</div>
             <div class="user-status">已加密保護</div>

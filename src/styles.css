@@ -132,14 +132,24 @@ body {
   padding-left: 16px;
 }
 
+.titlebar-mascot-img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 20%;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+  background: #cbd5e1;
+}
+
 .titlebar-icon {
   font-size: 14px;
 }
 
 .titlebar-text {
   font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
+  font-weight: 600;
+  color: var(--text-primary);
   letter-spacing: 0.5px;
 }
 
@@ -221,22 +231,45 @@ body {
 
 .auth-logo {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
-.auth-logo-icon {
-  font-size: 56px;
+.auth-mascot-wrap {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
   position: relative;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   animation: logo-pulse 3s ease-in-out infinite;
 }
 
-.shield-glow {
+.auth-mascot-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 20%;
+  position: relative;
+  z-index: 2;
+  border: 3px solid rgba(59, 130, 246, 0.85);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35);
+  background: radial-gradient(circle, #f1f5f9 0%, #cbd5e1 100%);
+  transition: transform 0.3s ease;
+}
+
+.auth-mascot-img:hover {
+  transform: scale(1.08) rotate(3deg);
+}
+
+.mascot-glow {
   position: absolute;
-  inset: -20px;
-  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  inset: -14px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, rgba(99, 102, 241, 0.25) 50%, transparent 75%);
   border-radius: 50%;
   animation: glow-pulse 3s ease-in-out infinite;
+  z-index: 1;
 }
 
 @keyframes logo-pulse {
@@ -558,6 +591,30 @@ input[type="range"]::-webkit-slider-thumb {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.user-avatar-wrap {
+  width: 44px;
+  height: 44px;
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.user-avatar-mascot {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 20%;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.35);
+  background: radial-gradient(circle, #f1f5f9 0%, #cbd5e1 100%);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.user-avatar-wrap:hover .user-avatar-mascot {
+  transform: scale(1.15) rotate(5deg);
 }
 
 .user-avatar {

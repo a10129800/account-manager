@@ -18,6 +18,49 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 # 切換到專案根目錄
 Set-Location -Path $PSScriptRoot
 
+# 確保專屬代表物資產就位 (生活感牛仔外套去背帥犬 + 方案A歡迎封面犬)
+$mascotSrc = "C:\Users\mice\.gemini\antigravity-ide\brain\93aa6c51-7009-45ac-a224-a3d4a8d12816\anthro_dog_isolated_1790597732222.jpg"
+$welcomeSrc = "C:\Users\mice\.gemini\antigravity-ide\brain\93aa6c51-7009-45ac-a224-a3d4a8d12816\mascot_arcane_stylized_1790598288807.jpg"
+
+$brainDir = "C:\Users\mice\.gemini\antigravity-ide\brain\93aa6c51-7009-45ac-a224-a3d4a8d12816"
+$galleryMap = @{
+    "mascot_arcane_stylized_1790598288807.jpg" = "mascot_welcome.jpg"
+    "mascot_cool_dev_glasses_1790598309579.jpg" = "mascot_glasses.jpg"
+    "anthro_dog_casual_hoodie_1790597605710.jpg" = "mascot_hoodie.jpg"
+}
+foreach ($item in $galleryMap.GetEnumerator()) {
+    $src = Join-Path $brainDir $item.Key
+    if (Test-Path $src) {
+        Copy-Item $src -Destination (Join-Path $PSScriptRoot $item.Value) -Force -ErrorAction SilentlyContinue
+        Copy-Item $src -Destination (Join-Path "$PSScriptRoot\src" $item.Value) -Force -ErrorAction SilentlyContinue
+    }
+}
+
+if (Test-Path $mascotSrc) {
+    Copy-Item $mascotSrc -Destination "$PSScriptRoot\curry_dog.jpg" -Force -ErrorAction SilentlyContinue
+    Copy-Item $mascotSrc -Destination "$PSScriptRoot\src\curry_dog.jpg" -Force -ErrorAction SilentlyContinue
+    try {
+        Add-Type -AssemblyName System.Drawing -ErrorAction SilentlyContinue
+        $bmp = [System.Drawing.Bitmap]::FromFile($mascotSrc)
+        $bmp.MakeTransparent([System.Drawing.Color]::FromArgb(255, 255, 255, 255))
+        $bmp.Save("$PSScriptRoot\curry_dog.png", [System.Drawing.Imaging.ImageFormat]::Png)
+        $bmp.Save("$PSScriptRoot\src\curry_dog.png", [System.Drawing.Imaging.ImageFormat]::Png)
+        $bmp.Dispose()
+    } catch {
+        Copy-Item $mascotSrc -Destination "$PSScriptRoot\curry_dog.png" -Force -ErrorAction SilentlyContinue
+        Copy-Item $mascotSrc -Destination "$PSScriptRoot\src\curry_dog.png" -Force -ErrorAction SilentlyContinue
+    }
+
+    # 備份至專案資產與 D 槽吉祥物庫
+    $mascotLib = "d:\專案吉祥物庫"
+    $assetMascot = "$PSScriptRoot\assets\mascot"
+    @($mascotLib, $assetMascot) | ForEach-Object {
+        if (-not (Test-Path $_)) { New-Item -ItemType Directory -Path $_ -Force | Out-Null }
+        Copy-Item "$PSScriptRoot\curry_dog.png" -Destination "$_\01_牛仔外套_透明去背.png" -Force -ErrorAction SilentlyContinue
+        Copy-Item $mascotSrc -Destination "$_\01_牛仔外套_去背高解析.jpg" -Force -ErrorAction SilentlyContinue
+    }
+}
+
 # 2. 檢查是否初始化 Git 倉庫
 if (-not (Test-Path ".git")) {
     Write-Host "[1/4] 正在初始化本地 Git 倉庫..." -ForegroundColor Yellow

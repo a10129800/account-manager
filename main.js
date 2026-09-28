@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -81,8 +81,71 @@ function verifyMasterPassword(password, stored) {
 let mainWindow;
 let masterPassword = null;
 
+// ===== 吉祥物資產初始化 (生活感牛仔外套帥犬 - 去背處理) =====
+const mascotSource = 'C:\\Users\\mice\\.gemini\\antigravity-ide\\brain\\93aa6c51-7009-45ac-a224-a3d4a8d12816\\anthro_dog_isolated_1790597732222.jpg';
+const mascotDestSrcJpg = path.join(__dirname, 'src', 'curry_dog.jpg');
+const mascotDestRootJpg = path.join(__dirname, 'curry_dog.jpg');
+const mascotDestSrcPng = path.join(__dirname, 'src', 'curry_dog.png');
+const mascotDestRootPng = path.join(__dirname, 'curry_dog.png');
+
+try {
+  if (fs.existsSync(mascotSource)) {
+    fs.copyFileSync(mascotSource, mascotDestSrcJpg);
+    fs.copyFileSync(mascotSource, mascotDestRootJpg);
+
+    // 去除純白背景生成真正透明 PNG
+    const img = nativeImage.createFromPath(mascotSource);
+    const size = img.getSize();
+    if (size.width > 0 && size.height > 0) {
+      const bitmap = img.toBitmap();
+      for (let i = 0; i < bitmap.length; i += 4) {
+        const b = bitmap[i];
+        const g = bitmap[i + 1];
+        const r = bitmap[i + 2];
+        if (r > 240 && g > 240 && b > 240) {
+          bitmap[i + 3] = 0; // 完全透明
+        } else if (r > 220 && g > 220 && b > 220) {
+          const avg = (r + g + b) / 3;
+          bitmap[i + 3] = Math.max(0, Math.min(255, Math.floor(((240 - avg) / 20) * 255)));
+        }
+      }
+      const transImg = nativeImage.createFromBitmap(bitmap, { width: size.width, height: size.height });
+      const pngBuffer = transImg.toPNG();
+      fs.writeFileSync(mascotDestSrcPng, pngBuffer);
+      fs.writeFileSync(mascotDestRootPng, pngBuffer);
+
+      // 備份並儲存全套吉祥物供未來專案使用
+      const assetDir = path.join(__dirname, 'assets', 'mascot');
+      const backupDir = 'd:\\專案吉祥物庫';
+      [assetDir, backupDir].forEach(dir => {
+        try {
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          fs.copyFileSync(mascotDestRootPng, path.join(dir, '01_牛仔外套_透明去背.png'));
+          fs.copyFileSync(mascotSource, path.join(dir, '01_牛仔外套_去背高解析.jpg'));
+          
+          const brainDir = 'C:\\Users\\mice\\.gemini\\antigravity-ide\\brain\\93aa6c51-7009-45ac-a224-a3d4a8d12816';
+          const fileMap = {
+            'anthro_dog_casual_jacket_1790597624188.jpg': '02_牛仔外套_街景圓標.jpg',
+            'anthro_dog_casual_hoodie_1790597605710.jpg': '03_墨綠連帽衛衣_咖啡廳.jpg',
+            'cool_anthro_dog_agent_1790597252084.jpg': '04_賽博朋克特工犬.jpg'
+          };
+          for (const [srcName, destName] of Object.entries(fileMap)) {
+            const p = path.join(brainDir, srcName);
+            if (fs.existsSync(p)) fs.copyFileSync(p, path.join(dir, destName));
+          }
+        } catch (_) {}
+      });
+    }
+  }
+} catch (e) {
+  console.warn('Mascot copy / transparency failed:', e.message);
+}
+
 function createWindow() {
-  const iconPath = path.join(__dirname, 'assets', 'icon.png');
+  let iconPath = path.join(__dirname, 'src', 'curry_dog.png');
+  if (!fs.existsSync(iconPath)) {
+    iconPath = path.join(__dirname, 'src', 'curry_dog.jpg');
+  }
   const winOptions = {
     width: 1200,
     height: 800,
